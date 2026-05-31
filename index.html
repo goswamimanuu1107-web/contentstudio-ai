@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentStudio AI — Create · Generate · Grow</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0F172A;
+    --navy2: #1E293B;
+    --teal: #14B8A6;
+    --teal2: #0D9488;
+    --white: #F8FAFC;
+    --gray: #94A3B8;
+    --border: rgba(20,184,166,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Poppins',sans-serif;
+    background:var(--navy);
+    color:var(--white);
+    overflow-x:hidden;
+  }
+
+  /* NAV */
+  nav {
+    position:fixed; top:0; width:100%; z-index:100;
+    background:rgba(15,23,42,0.95);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    padding:1rem 2rem;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo {
+    display:flex; align-items:center; gap:8px;
+    font-size:1.2rem; font-weight:700; color:var(--white);
+    text-decoration:none;
+  }
+  .logo-dot {
+    width:10px; height:10px; border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 10px var(--teal);
+  }
+  .nav-links { display:flex; gap:2rem; list-style:none; }
+  .nav-links a {
+    color:var(--gray); text-decoration:none;
+    font-size:0.9rem; font-weight:500;
+    transition:color .2s;
+  }
+  .nav-links a:hover { color:var(--teal); }
+  .nav-cta {
+    background:var(--teal); color:var(--navy);
+    padding:0.5rem 1.25rem; border-radius:8px;
+    font-weight:600; font-size:0.9rem;
+    text-decoration:none; transition:all .2s;
+  }
+  .nav-cta:hover { background:var(--teal2); transform:translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    padding:8rem 2rem 4rem;
+    position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; top:-50%; left:-50%;
+    width:200%; height:200%;
+    background:radial-gradient(circle at 50% 40%, rgba(20,184,166,0.08) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(20,184,166,0.1);
+    border:1px solid var(--border);
+    border-radius:50px; padding:0.4rem 1rem;
+    font-size:0.8rem; color:var(--teal);
+    margin-bottom:1.5rem;
+    animation:fadeUp .6s ease both;
+  }
+  .hero h1 {
+    font-size:clamp(2.5rem,6vw,4.5rem);
+    font-weight:800; line-height:1.1;
+    margin-bottom:1.5rem;
+    animation:fadeUp .6s .1s ease both;
+  }
+  .hero h1 span { color:var(--teal); }
+  .hero p {
+    font-size:1.15rem; color:var(--gray);
+    max-width:600px; margin:0 auto 2.5rem;
+    line-height:1.7;
+    animation:fadeUp .6s .2s ease both;
+  }
+  .hero-btns {
+    display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;
+    animation:fadeUp .6s .3s ease both;
+  }
+  .btn-primary {
+    background:var(--teal); color:var(--navy);
+    padding:0.85rem 2rem; border-radius:10px;
+    font-weight:700; font-size:1rem;
+    text-decoration:none; transition:all .2s;
+    box-shadow:0 4px 20px rgba(20,184,166,0.3);
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(20,184,166,0.4); }
+  .btn-secondary {
+    background:transparent; color:var(--white);
+    padding:0.85rem 2rem; border-radius:10px;
+    font-weight:600; font-size:1rem;
+    text-decoration:none; border:1px solid var(--border);
+    transition:all .2s;
+  }
+  .btn-secondary:hover { border-color:var(--teal); color:var(--teal); }
+
+  /* STATS */
+  .stats {
+    display:flex; justify-content:center; gap:3rem; flex-wrap:wrap;
+    padding:3rem 2rem;
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    background:rgba(30,41,59,0.5);
+  }
+  .stat { text-align:center; }
+  .stat-num { font-size:2rem; font-weight:800; color:var(--teal); }
+  .stat-label { font-size:0.85rem; color:var(--gray); margin-top:4px; }
+
+  /* SECTION */
+  section { padding:5rem 2rem; max-width:1100px; margin:0 auto; }
+  .section-label {
+    font-size:0.8rem; font-weight:600; color:var(--teal);
+    letter-spacing:.1em; text-transform:uppercase;
+    margin-bottom:.75rem;
+  }
+  .section-title {
+    font-size:clamp(1.8rem,4vw,2.8rem);
+    font-weight:700; margin-bottom:1rem; line-height:1.2;
+  }
+  .section-sub { color:var(--gray); font-size:1rem; max-width:500px; line-height:1.7; }
+
+  /* FEATURES */
+  .features-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:1.5rem; margin-top:3rem;
+  }
+  .feature-card {
+    background:var(--navy2);
+    border:1px solid var(--border);
+    border-radius:16px; padding:1.75rem;
+    transition:all .3s;
+  }
+  .feature-card:hover {
+    border-color:var(--teal);
+    transform:translateY(-4px);
+    box-shadow:0 10px 40px rgba(20,184,166,0.1);
+  }
+  .feature-icon {
+    width:48px; height:48px; border-radius:12px;
+    background:rgba(20,184,166,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; margin-bottom:1rem;
+  }
+  .feature-card h3 { font-size:1.05rem; font-weight:600; margin-bottom:.5rem; }
+  .feature-card p { font-size:0.9rem; color:var(--gray); line-height:1.6; }
+
+  /* HOW IT WORKS */
+  .how-section { background:rgba(30,41,59,0.3); border-radius:24px; padding:4rem 3rem; }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:2rem; margin-top:3rem; }
+  .step { text-align:center; }
+  .step-num {
+    width:52px; height:52px; border-radius:50%;
+    background:var(--teal); color:var(--navy);
+    font-size:1.3rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1rem;
+    box-shadow:0 4px 15px rgba(20,184,166,0.3);
+  }
+  .step h3 { font-size:1rem; font-weight:600; margin-bottom:.5rem; }
+  .step p { font-size:0.85rem; color:var(--gray); line-height:1.6; }
+
+  /* TOOLS CHIPS */
+  .tools-chips { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:2rem; }
+  .chip {
+    background:rgba(20,184,166,0.08);
+    border:1px solid var(--border);
+    border-radius:50px; padding:.4rem 1rem;
+    font-size:0.85rem; color:var(--teal);
+    font-weight:500;
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.5rem; margin-top:3rem;
+  }
+  .price-card {
+    background:var(--navy2);
+    border:1px solid var(--border);
+    border-radius:20px; padding:2rem;
+    transition:all .3s; position:relative;
+  }
+  .price-card.popular {
+    border-color:var(--teal);
+    box-shadow:0 0 40px rgba(20,184,166,0.15);
+  }
+  .popular-badge {
+    position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+    background:var(--teal); color:var(--navy);
+    font-size:0.75rem; font-weight:700; padding:.25rem .75rem;
+    border-radius:50px;
+  }
+  .price-name { font-size:1rem; font-weight:600; color:var(--gray); margin-bottom:.75rem; }
+  .price-amount { font-size:2.5rem; font-weight:800; color:var(--white); }
+  .price-amount span { font-size:1rem; font-weight:400; color:var(--gray); }
+  .price-period { font-size:0.85rem; color:var(--gray); margin-bottom:1.5rem; }
+  .price-features { list-style:none; margin-bottom:2rem; }
+  .price-features li {
+    font-size:0.9rem; color:var(--gray);
+    padding:.4rem 0;
+    border-bottom:1px solid rgba(148,163,184,0.1);
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .price-features li::before { content:'✓'; color:var(--teal); font-weight:700; }
+  .btn-plan {
+    width:100%; padding:.85rem;
+    border-radius:10px; font-weight:600; font-size:.95rem;
+    cursor:pointer; transition:all .2s; text-align:center;
+    display:block; text-decoration:none;
+  }
+  .btn-plan-outline {
+    background:transparent; color:var(--teal);
+    border:1px solid var(--teal);
+  }
+  .btn-plan-outline:hover { background:rgba(20,184,166,0.1); }
+  .btn-plan-filled {
+    background:var(--teal); color:var(--navy); border:none;
+    box-shadow:0 4px 20px rgba(20,184,166,0.3);
+  }
+  .btn-plan-filled:hover { background:var(--teal2); transform:translateY(-2px); }
+
+  /* TARGET USERS */
+  .users-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1rem; margin-top:2.5rem;
+  }
+  .user-card {
+    background:var(--navy2); border:1px solid var(--border);
+    border-radius:12px; padding:1.25rem; text-align:center;
+    transition:all .3s;
+  }
+  .user-card:hover { border-color:var(--teal); transform:translateY(-3px); }
+  .user-icon { font-size:2rem; margin-bottom:.5rem; }
+  .user-card p { font-size:0.85rem; font-weight:500; }
+
+  /* CTA BANNER */
+  .cta-banner {
+    background:linear-gradient(135deg, rgba(20,184,166,0.15), rgba(20,184,166,0.05));
+    border:1px solid var(--border);
+    border-radius:24px; padding:4rem 2rem;
+    text-align:center; margin:2rem 0;
+  }
+  .cta-banner h2 { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; margin-bottom:1rem; }
+  .cta-banner p { color:var(--gray); margin-bottom:2rem; font-size:1rem; }
+
+  /* FOOTER */
+  footer {
+    background:rgba(15,23,42,0.8);
+    border-top:1px solid var(--border);
+    padding:3rem 2rem;
+    text-align:center;
+  }
+  .footer-logo {
+    font-size:1.3rem; font-weight:700;
+    color:var(--white); margin-bottom:1rem;
+    display:flex; align-items:center; gap:8px; justify-content:center;
+  }
+  footer p { color:var(--gray); font-size:0.85rem; margin-bottom:.5rem; }
+  .footer-links { display:flex; gap:1.5rem; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
+  .footer-links a { color:var(--gray); text-decoration:none; font-size:0.85rem; }
+  .footer-links a:hover { color:var(--teal); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* MOBILE */
+  @media(max-width:768px) {
+    .nav-links { display:none; }
+    .stats { gap:1.5rem; }
+    section { padding:3rem 1.25rem; }
+    .how-section { padding:2.5rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-dot"></div>
+    ContentStudio AI
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta">Get Started Free</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-badge">🚀 AI-Powered Content Platform</div>
+    <h1>Create Content That<br><span>Converts & Grows</span></h1>
+    <p>ContentStudio AI generates captions, scripts, proposals, and more — in seconds. Built for creators, coaches, businesses, and startups.</p>
+    <div class="hero-btns">
+      <a href="#pricing" class="btn-primary">Start Free — No Card Needed</a>
+      <a href="#features" class="btn-secondary">See All Features</a>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">6+</div><div class="stat-label">AI Tools in One</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Avg Generation Time</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free to Start</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">AI Guide Available</div></div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">What You Get</div>
+  <h2 class="section-title">Everything You Need to<br>Create & Win</h2>
+  <p class="section-sub">From daily social posts to professional proposals — all powered by Gemini AI.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✍️</div>
+      <h3>Caption Generator</h3>
+      <p>Instagram, LinkedIn, Twitter captions with hashtags — tailored to your tone and audience.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎬</div>
+      <h3>Video Script Writer</h3>
+      <p>YouTube hooks, Reels scripts, intro-outro templates — go viral with AI-crafted scripts.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📄</div>
+      <h3>Proposal Builder</h3>
+      <p>Professional client proposals ready as PDF in minutes. Perfect for freelancers and agencies.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <h3>Content Calendar</h3>
+      <p>30-day content plan generated in one click — platform-wise, topic-wise, all organized.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📧</div>
+      <h3>Email Templates</h3>
+      <p>Welcome series, newsletters, cold outreach — high-converting emails written by AI.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Studio Guide</h3>
+      <p>Built-in chatbot that guides you step by step — never get stuck, always stay productive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IS IT FOR -->
+<section>
+  <div class="section-label">Who It's For</div>
+  <h2 class="section-title">Built for Professionals<br>Who Mean Business</h2>
+  <div class="users-grid">
+    <div class="user-card"><div class="user-icon">🎥</div><p>Content Creators</p></div>
+    <div class="user-card"><div class="user-icon">🎓</div><p>Coaches & Educators</p></div>
+    <div class="user-card"><div class="user-icon">💼</div><p>Business Professionals</p></div>
+    <div class="user-card"><div class="user-icon">🏠</div><p>Broker & Agents</p></div>
+    <div class="user-card"><div class="user-icon">🎨</div><p>Creative Designers</p></div>
+    <div class="user-card"><div class="user-icon">🚀</div><p>Startup Founders</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="how-section">
+    <div class="section-label">Simple Process</div>
+    <h2 class="section-title">How ContentStudio AI Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Tell Us About You</h3>
+        <p>Quick onboarding — tell us your role and what you create. We personalize everything for you.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Choose Your Tool</h3>
+        <p>Pick from captions, scripts, proposals, calendars, emails — all in one dashboard.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>AI Generates</h3>
+        <p>Gemini AI creates your content in under 30 seconds — review, edit, and use instantly.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Create · Grow · Win</h3>
+        <p>Save hours every week. Focus on what matters — your audience and your growth.</p>
+      </div>
+    </div>
+    <div class="tools-chips">
+      <span class="chip">Instagram Captions</span>
+      <span class="chip">YouTube Scripts</span>
+      <span class="chip">LinkedIn Posts</span>
+      <span class="chip">Client Proposals</span>
+      <span class="chip">Email Newsletters</span>
+      <span class="chip">Content Calendar</span>
+      <span class="chip">Twitter Threads</span>
+      <span class="chip">Brand Copywriting</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-label">Simple Pricing</div>
+  <h2 class="section-title">Start Free. Scale When<br>You're Ready.</h2>
+  <p class="section-sub">No hidden fees. No credit card needed to start.</p>
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <div class="price-name">Starter</div>
+      <div class="price-amount">₹0 <span>/ $0</span></div>
+      <div class="price-period">Forever Free</div>
+      <ul class="price-features">
+        <li>5 AI generations per day</li>
+        <li>3 tools access</li>
+        <li>Basic chatbot guide</li>
+        <li>Watermark on PDF</li>
+      </ul>
+      <a href="#" class="btn-plan btn-plan-outline">Get Started Free</a>
+    </div>
+
+    <div class="price-card popular">
+      <div class="popular-badge">⭐ Most Popular</div>
+      <div class="price-name">Pro</div>
+      <div class="price-amount">₹299 <span>/ $9</span></div>
+      <div class="price-period">per month — cancel anytime</div>
+      <ul class="price-features">
+        <li>Unlimited AI generations</li>
+        <li>All 6+ tools access</li>
+        <li>PDF proposals (no watermark)</li>
+        <li>Priority AI chatbot</li>
+        <li>Email templates included</li>
+      </ul>
+      <a href="#" class="btn-plan btn-plan-filled">Start Pro Plan</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-name">Max</div>
+      <div class="price-amount">₹1999 <span>/ $79</span></div>
+      <div class="price-period">per year — save 2 months</div>
+      <ul class="price-features">
+        <li>Everything in Pro</li>
+        <li>Team access (3 users)</li>
+        <li>API access</li>
+        <li>Custom branding</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#" class="btn-plan btn-plan-outline">Go Max Annual</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="cta-banner">
+    <h2>Ready to 10x Your Content Output?</h2>
+    <p>Join thousands of creators and professionals already using ContentStudio AI.</p>
+    <a href="#pricing" class="btn-primary">Start for Free Today →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-dot"></div>
+    ContentStudio AI
+  </div>
+  <p>Create · Generate · Grow</p>
+  <p style="margin-top:.5rem">© 2026 ContentStudio AI. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Support</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
