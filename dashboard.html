@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — ContentStudio AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0F172A;
+    --navy2: #1E293B;
+    --navy3: #243044;
+    --teal: #14B8A6;
+    --teal2: #0D9488;
+    --white: #F8FAFC;
+    --gray: #94A3B8;
+    --border: rgba(20,184,166,0.15);
+    --red: #EF4444;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Poppins',sans-serif;
+    background:var(--navy);
+    color:var(--white);
+    display:flex; height:100vh; overflow:hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:220px; flex-shrink:0;
+    background:var(--navy2);
+    border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
+    padding:1.25rem 0;
+  }
+  .sidebar-logo {
+    display:flex; align-items:center; gap:8px;
+    padding:0 1.25rem 1.25rem;
+    border-bottom:1px solid var(--border);
+    font-size:1rem; font-weight:700;
+  }
+  .logo-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 8px var(--teal);
+  }
+  .sidebar-section {
+    padding:.75rem 1.25rem .25rem;
+    font-size:10px; font-weight:600;
+    color:var(--gray); letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:.6rem 1.25rem;
+    font-size:.85rem; font-weight:500;
+    color:var(--gray); cursor:pointer;
+    transition:all .15s; border-left:2px solid transparent;
+    text-decoration:none;
+  }
+  .nav-item:hover { color:var(--white); background:rgba(255,255,255,0.04); }
+  .nav-item.active {
+    color:var(--teal);
+    background:rgba(20,184,166,0.08);
+    border-left-color:var(--teal);
+  }
+  .nav-icon { font-size:16px; width:18px; text-align:center; }
+  .sidebar-bottom {
+    margin-top:auto;
+    border-top:1px solid var(--border);
+    padding:.75rem 0 0;
+  }
+  .usage-wrap { padding:.5rem 1.25rem 1rem; }
+  .usage-label {
+    display:flex; justify-content:space-between;
+    font-size:11px; color:var(--gray); margin-bottom:5px;
+  }
+  .usage-track {
+    height:4px; background:var(--navy3);
+    border-radius:2px; overflow:hidden;
+  }
+  .usage-fill {
+    height:100%; background:var(--teal);
+    border-radius:2px; width:60%;
+  }
+  .upgrade-btn {
+    margin:.5rem 1rem 0;
+    display:block; text-align:center;
+    background:var(--teal); color:var(--navy);
+    padding:.5rem; border-radius:8px;
+    font-size:.8rem; font-weight:600;
+    text-decoration:none; cursor:pointer;
+    border:none; width:calc(100% - 2rem);
+    transition:all .2s;
+  }
+  .upgrade-btn:hover { background:var(--teal2); }
+
+  /* MAIN */
+  .main {
+    flex:1; display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .topbar {
+    padding:.85rem 1.5rem;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center;
+    justify-content:space-between;
+    background:var(--navy);
+    flex-shrink:0;
+  }
+  .page-title { font-size:1rem; font-weight:600; }
+  .page-sub { font-size:.75rem; color:var(--gray); margin-top:1px; }
+  .user-area { display:flex; align-items:center; gap:.75rem; }
+  .plan-chip {
+    background:rgba(20,184,166,0.1);
+    border:1px solid var(--border);
+    color:var(--teal); font-size:.7rem;
+    padding:2px 8px; border-radius:50px;
+    font-weight:600;
+  }
+  .avatar {
+    width:30px; height:30px; border-radius:50%;
+    background:var(--teal); color:var(--navy);
+    font-size:.8rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+
+  /* CONTENT AREA */
+  .content {
+    flex:1; overflow-y:auto; padding:1.5rem;
+  }
+
+  /* TOOL PANELS */
+  .tool-panel { display:none; }
+  .tool-panel.active { display:block; }
+
+  /* WELCOME */
+  .welcome-banner {
+    background:linear-gradient(135deg,rgba(20,184,166,0.12),rgba(20,184,166,0.04));
+    border:1px solid var(--border);
+    border-radius:14px; padding:1.25rem 1.5rem;
+    display:flex; align-items:center;
+    justify-content:space-between; margin-bottom:1.5rem;
+  }
+  .wb-title { font-size:1.1rem; font-weight:600; margin-bottom:3px; }
+  .wb-sub { font-size:.8rem; color:var(--gray); }
+  .wb-icon { font-size:2rem; }
+
+  /* TOOL GRID */
+  .tool-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:1rem;
+  }
+  .tool-card {
+    background:var(--navy2);
+    border:1px solid var(--border);
+    border-radius:12px; padding:1.1rem;
+    cursor:pointer; transition:all .2s;
+  }
+  .tool-card:hover {
+    border-color:var(--teal);
+    transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(20,184,166,0.1);
+  }
+  .tc-icon {
+    width:40px; height:40px; border-radius:10px;
+    background:rgba(20,184,166,0.1);
+    display:flex; align-items:center;
+    justify-content:center; font-size:1.2rem;
+    margin-bottom:.75rem;
+  }
+  .tc-name { font-size:.9rem; font-weight:600; margin-bottom:.3rem; }
+  .tc-desc { font-size:.75rem; color:var(--gray); line-height:1.5; }
+  .tc-badge {
+    display:inline-block; margin-top:.5rem;
+    font-size:.65rem; padding:2px 7px;
+    border-radius:50px; font-weight:600;
+  }
+  .badge-free { background:#E1F5EE; color:#085041; }
+  .badge-pro { background:#EEEDFE; color:#3C3489; }
+
+  /* GENERATOR UI */
+  .gen-wrap {
+    max-width:780px;
+  }
+  .gen-header {
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:1.25rem;
+  }
+  .gen-back {
+    background:var(--navy2); border:1px solid var(--border);
+    color:var(--gray); padding:.4rem .85rem;
+    border-radius:8px; font-size:.8rem;
+    cursor:pointer; transition:all .2s;
+  }
+  .gen-back:hover { color:var(--white); border-color:var(--gray); }
+  .gen-title { font-size:1.1rem; font-weight:600; }
+  .gen-icon { font-size:1.4rem; }
+
+  .form-group { margin-bottom:1rem; }
+  .form-label {
+    display:block; font-size:.8rem;
+    font-weight:500; color:var(--gray);
+    margin-bottom:.4rem;
+  }
+  .form-input, .form-select, .form-textarea {
+    width:100%; background:var(--navy2);
+    border:1px solid var(--border);
+    border-radius:8px; padding:.65rem .9rem;
+    color:var(--white); font-family:'Poppins',sans-serif;
+    font-size:.85rem; transition:border .2s;
+    outline:none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color:var(--teal);
+  }
+  .form-textarea { resize:vertical; min-height:90px; }
+  .form-select option { background:var(--navy2); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+  .generate-btn {
+    background:var(--teal); color:var(--navy);
+    border:none; border-radius:10px;
+    padding:.8rem 2rem; font-size:.95rem;
+    font-weight:700; cursor:pointer;
+    transition:all .2s; width:100%;
+    margin-top:.5rem;
+  }
+  .generate-btn:hover { background:var(--teal2); transform:translateY(-1px); }
+  .generate-btn:disabled {
+    opacity:.6; cursor:not-allowed; transform:none;
+  }
+
+  /* OUTPUT */
+  .output-wrap {
+    margin-top:1.25rem;
+    background:var(--navy2);
+    border:1px solid var(--border);
+    border-radius:12px; overflow:hidden;
+    display:none;
+  }
+  .output-wrap.show { display:block; }
+  .output-header {
+    padding:.75rem 1rem;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center;
+    justify-content:space-between;
+  }
+  .output-title { font-size:.8rem; font-weight:600; color:var(--teal); }
+  .copy-btn {
+    background:rgba(20,184,166,0.1);
+    border:1px solid var(--border);
+    color:var(--teal); padding:.3rem .75rem;
+    border-radius:6px; font-size:.75rem;
+    cursor:pointer; font-weight:500;
+    transition:all .2s;
+  }
+  .copy-btn:hover { background:rgba(20,184,166,0.2); }
+  .output-body {
+    padding:1rem; font-size:.85rem;
+    line-height:1.8; color:var(--white);
+    white-space:pre-wrap; min-height:80px;
+  }
+  .loading-dots {
+    display:inline-flex; gap:4px; align-items:center;
+  }
+  .loading-dots span {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--teal); animation:bounce .8s infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay:.15s; }
+  .loading-dots span:nth-child(3) { animation-delay:.3s; }
+  @keyframes bounce {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-5px); }
+  }
+
+  /* ERROR */
+  .error-msg {
+    background:rgba(239,68,68,0.1);
+    border:1px solid rgba(239,68,68,0.3);
+    color:#FCA5A5; padding:.75rem 1rem;
+    border-radius:8px; font-size:.82rem;
+    margin-top:.75rem; display:none;
+  }
+  .error-msg.show { display:block; }
+
+  /* SCROLLBAR */
+  .content::-webkit-scrollbar { width:4px; }
+  .content::-webkit-scrollbar-track { background:transparent; }
+  .content::-webkit-scrollbar-thumb {
+    background:var(--border); border-radius:2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-dot"></div>
+    ContentStudio AI
+  </div>
+
+  <div class="sidebar-section">Tools</div>
+  <div class="nav-item active" onclick="showHome()">
+    <span class="nav-icon">🏠</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="openTool('caption')">
+    <span class="nav-icon">✍️</span> Caption Generator
+  </div>
+  <div class="nav-item" onclick="openTool('script')">
+    <span class="nav-icon">🎬</span> Script Writer
+  </div>
+  <div class="nav-item" onclick="openTool('proposal')">
+    <span class="nav-icon">📄</span> Proposal Builder
+  </div>
+  <div class="nav-item" onclick="openTool('calendar')">
+    <span class="nav-icon">📅</span> Content Calendar
+  </div>
+  <div class="nav-item" onclick="openTool('email')">
+    <span class="nav-icon">📧</span> Email Templates
+  </div>
+  <div class="nav-item" onclick="openTool('outreach')">
+    <span class="nav-icon">🎯</span> Cold Outreach
+  </div>
+
+  <div class="sidebar-section">Account</div>
+  <div class="nav-item" onclick="showHome()">
+    <span class="nav-icon">⚙️</span> Settings
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="usage-wrap">
+      <div class="usage-label">
+        <span>Daily Usage</span><span>3 / 5 free</span>
+      </div>
+      <div class="usage-track"><div class="usage-fill"></div></div>
+    </div>
+    <button class="upgrade-btn" onclick="alert('Upgrade coming soon!')">
+      ⚡ Upgrade to Pro
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="topbar-title">Dashboard</div>
+      <div class="page-sub" id="topbar-sub">Welcome back — what will you create today?</div>
+    </div>
+    <div class="user-area">
+      <div class="plan-chip">Free Plan</div>
+      <div class="avatar">M</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="tool-panel active" id="panel-home">
+      <div class="welcome-banner">
+        <div>
+          <div class="wb-title">Namaste! Ready to create? 👋</div>
+          <div class="wb-sub">Choose a tool below and generate content in seconds.</div>
+        </div>
+        <div class="wb-icon">✨</div>
+      </div>
+      <div class="tool-grid">
+        <div class="tool-card" onclick="openTool('caption')">
+          <div class="tc-icon">✍️</div>
+          <div class="tc-name">Caption Generator</div>
+          <div class="tc-desc">Instagram, LinkedIn, Twitter captions with hashtags</div>
+          <span class="tc-badge badge-free">Free</span>
+        </div>
+        <div class="tool-card" onclick="openTool('script')">
+          <div class="tc-icon">🎬</div>
+          <div class="tc-name">Script Writer</div>
+          <div class="tc-desc">YouTube hooks, Reels scripts, intro-outro templates</div>
+          <span class="tc-badge badge-free">Free</span>
+        </div>
+        <div class="tool-card" onclick="openTool('proposal')">
+          <div class="tc-icon">📄</div>
+          <div class="tc-name">Proposal Builder</div>
+          <div class="tc-desc">Professional client proposals ready as PDF</div>
+          <span class="tc-badge badge-pro">Pro</span>
+        </div>
+        <div class="tool-card" onclick="openTool('calendar')">
+          <div class="tc-icon">📅</div>
+          <div class="tc-name">Content Calendar</div>
+          <div class="tc-desc">30-day content plan generated in one click</div>
+          <span class="tc-badge badge-pro">Pro</span>
+        </div>
+        <div class="tool-card" onclick="openTool('email')">
+          <div class="tc-icon">📧</div>
+          <div class="tc-name">Email Templates</div>
+          <div class="tc-desc">Welcome series, newsletters, cold outreach emails</div>
+          <span class="tc-badge badge-free">Free</span>
+        </div>
+        <div class="tool-card" onclick="openTool('outreach')">
+          <div class="tc-icon">🎯</div>
+          <div class="tc-name">Cold Outreach</div>
+          <div class="tc-desc">Brand pitches, client outreach, investor messages</div>
+          <span class="tc-badge badge-free">Free</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAPTION GENERATOR -->
+    <div class="tool-panel" id="panel-caption">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">✍️</span>
+          <div class="gen-title">Caption Generator</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <select class="form-select" id="cap-platform">
+              <option>Instagram</option>
+              <option>LinkedIn</option>
+              <option>Twitter / X</option>
+              <option>Facebook</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tone</label>
+            <select class="form-select" id="cap-tone">
+              <option>Professional</option>
+              <option>Casual & Fun</option>
+              <option>Motivational</option>
+              <option>Educational</option>
+              <option>Humorous</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Topic / Post idea</label>
+          <input class="form-input" id="cap-topic" placeholder="e.g. Morning workout tips, new product launch, travel vlog...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your niche / brand (optional)</label>
+          <input class="form-input" id="cap-niche" placeholder="e.g. Fitness coach, digital marketer, real estate agent...">
+        </div>
+        <button class="generate-btn" id="cap-btn" onclick="generateCaption()">
+          ✨ Generate Caption
+        </button>
+        <div class="error-msg" id="cap-error"></div>
+        <div class="output-wrap" id="cap-output">
+          <div class="output-header">
+            <span class="output-title">✅ Generated Caption</span>
+            <button class="copy-btn" onclick="copyOutput('cap-body')">Copy</button>
+          </div>
+          <div class="output-body" id="cap-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPT WRITER -->
+    <div class="tool-panel" id="panel-script">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">🎬</span>
+          <div class="gen-title">Script Writer</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <select class="form-select" id="scr-platform">
+              <option>YouTube (Long form)</option>
+              <option>Instagram Reels</option>
+              <option>YouTube Shorts</option>
+              <option>Podcast intro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Video Duration</label>
+            <select class="form-select" id="scr-duration">
+              <option>30 seconds</option>
+              <option>60 seconds</option>
+              <option>3-5 minutes</option>
+              <option>10+ minutes</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Video topic</label>
+          <input class="form-input" id="scr-topic" placeholder="e.g. How to build morning routine, Top 5 investment tips...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target audience</label>
+          <input class="form-input" id="scr-audience" placeholder="e.g. College students, working professionals, fitness beginners...">
+        </div>
+        <button class="generate-btn" id="scr-btn" onclick="generateScript()">
+          ✨ Generate Script
+        </button>
+        <div class="error-msg" id="scr-error"></div>
+        <div class="output-wrap" id="scr-output">
+          <div class="output-header">
+            <span class="output-title">✅ Generated Script</span>
+            <button class="copy-btn" onclick="copyOutput('scr-body')">Copy</button>
+          </div>
+          <div class="output-body" id="scr-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPOSAL BUILDER -->
+    <div class="tool-panel" id="panel-proposal">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">📄</span>
+          <div class="gen-title">Proposal Builder</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your name / Company</label>
+            <input class="form-input" id="pro-sender" placeholder="e.g. Rahul Sharma, Creative Studio">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client name</label>
+            <input class="form-input" id="pro-client" placeholder="e.g. XYZ Pvt Ltd, John Smith">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Service type</label>
+            <select class="form-select" id="pro-service">
+              <option>Social Media Management</option>
+              <option>Video Production</option>
+              <option>Web Design</option>
+              <option>Content Writing</option>
+              <option>Real Estate Consultation</option>
+              <option>Business Consulting</option>
+              <option>Digital Marketing</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Budget range</label>
+            <input class="form-input" id="pro-budget" placeholder="e.g. ₹25,000 - ₹50,000">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project details</label>
+          <textarea class="form-textarea" id="pro-details" placeholder="Briefly describe what you will do for the client..."></textarea>
+        </div>
+        <button class="generate-btn" id="pro-btn" onclick="generateProposal()">
+          ✨ Generate Proposal
+        </button>
+        <div class="error-msg" id="pro-error"></div>
+        <div class="output-wrap" id="pro-output">
+          <div class="output-header">
+            <span class="output-title">✅ Generated Proposal</span>
+            <button class="copy-btn" onclick="copyOutput('pro-body')">Copy</button>
+          </div>
+          <div class="output-body" id="pro-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT CALENDAR -->
+    <div class="tool-panel" id="panel-calendar">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">📅</span>
+          <div class="gen-title">Content Calendar</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <select class="form-select" id="cal-platform">
+              <option>Instagram</option>
+              <option>LinkedIn</option>
+              <option>YouTube</option>
+              <option>Twitter / X</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <select class="form-select" id="cal-duration">
+              <option>7 days</option>
+              <option>14 days</option>
+              <option>30 days</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your niche / industry</label>
+          <input class="form-input" id="cal-niche" placeholder="e.g. Fitness, Real estate, Fashion, Tech startup...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Content goal</label>
+          <select class="form-select" id="cal-goal">
+            <option>Grow followers</option>
+            <option>Generate leads</option>
+            <option>Build brand awareness</option>
+            <option>Drive sales</option>
+            <option>Educate audience</option>
+          </select>
+        </div>
+        <button class="generate-btn" id="cal-btn" onclick="generateCalendar()">
+          ✨ Generate Content Calendar
+        </button>
+        <div class="error-msg" id="cal-error"></div>
+        <div class="output-wrap" id="cal-output">
+          <div class="output-header">
+            <span class="output-title">✅ Content Calendar</span>
+            <button class="copy-btn" onclick="copyOutput('cal-body')">Copy</button>
+          </div>
+          <div class="output-body" id="cal-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAIL TEMPLATES -->
+    <div class="tool-panel" id="panel-email">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">📧</span>
+          <div class="gen-title">Email Templates</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email type</label>
+            <select class="form-select" id="em-type">
+              <option>Welcome email</option>
+              <option>Newsletter</option>
+              <option>Product launch</option>
+              <option>Follow-up email</option>
+              <option>Re-engagement email</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tone</label>
+            <select class="form-select" id="em-tone">
+              <option>Professional</option>
+              <option>Friendly</option>
+              <option>Urgent</option>
+              <option>Conversational</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your brand / product name</label>
+          <input class="form-input" id="em-brand" placeholder="e.g. ContentStudio AI, FitLife Academy...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Key message / offer</label>
+          <textarea class="form-textarea" id="em-msg" placeholder="What do you want to tell your audience?"></textarea>
+        </div>
+        <button class="generate-btn" id="em-btn" onclick="generateEmail()">
+          ✨ Generate Email
+        </button>
+        <div class="error-msg" id="em-error"></div>
+        <div class="output-wrap" id="em-output">
+          <div class="output-header">
+            <span class="output-title">✅ Generated Email</span>
+            <button class="copy-btn" onclick="copyOutput('em-body')">Copy</button>
+          </div>
+          <div class="output-body" id="em-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLD OUTREACH -->
+    <div class="tool-panel" id="panel-outreach">
+      <div class="gen-wrap">
+        <div class="gen-header">
+          <button class="gen-back" onclick="showHome()">← Back</button>
+          <span class="gen-icon">🎯</span>
+          <div class="gen-title">Cold Outreach Generator</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Outreach type</label>
+            <select class="form-select" id="out-type">
+              <option>Brand collaboration pitch</option>
+              <option>Client outreach</option>
+              <option>Investor pitch</option>
+              <option>Partnership proposal</option>
+              <option>Job / freelance inquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Platform / Format</label>
+            <select class="form-select" id="out-format">
+              <option>Email</option>
+              <option>LinkedIn DM</option>
+              <option>Instagram DM</option>
+              <option>WhatsApp message</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your name / brand</label>
+            <input class="form-input" id="out-sender" placeholder="e.g. Manish, ContentStudio AI">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Recipient / company</label>
+            <input class="form-input" id="out-recipient" placeholder="e.g. Zomato, Startup founder...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">What are you offering / asking?</label>
+          <textarea class="form-textarea" id="out-offer" placeholder="Briefly explain your offer or request..."></textarea>
+        </div>
+        <button class="generate-btn" id="out-btn" onclick="generateOutreach()">
+          ✨ Generate Outreach Message
+        </button>
+        <div class="error-msg" id="out-error"></div>
+        <div class="output-wrap" id="out-output">
+          <div class="output-header">
+            <span class="output-title">✅ Generated Message</span>
+            <button class="copy-btn" onclick="copyOutput('out-body')">Copy</button>
+          </div>
+          <div class="output-body" id="out-body"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+// ============ GEMINI API KEY ============
+const GEMINI_KEY = "AIzaSyDkmuugU0xfuVC1LWMZNOBrE6oSDB6Roc8";
+// ========================================
+
+async function callGemini(prompt) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    }
+  );
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.candidates[0].content.parts[0].text;
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="loading-dots"><span></span><span></span><span></span></span> Generating...'
+    : btn.getAttribute("data-label") || "✨ Generate";
+}
+
+function showOutput(outputId, bodyId, text) {
+  document.getElementById(outputId).classList.add("show");
+  document.getElementById(bodyId).textContent = text;
+}
+
+function showError(errId, msg) {
+  const el = document.getElementById(errId);
+  el.textContent = "⚠️ " + msg;
+  el.classList.add("show");
+}
+
+function hideError(errId) {
+  document.getElementById(errId).classList.remove("show");
+}
+
+function copyOutput(bodyId) {
+  const text = document.getElementById(bodyId).textContent;
+  navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+}
+
+// NAV
+function showHome() {
+  document.querySelectorAll(".tool-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-home").classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.querySelectorAll(".nav-item")[0].classList.add("active");
+  document.getElementById("topbar-title").textContent = "Dashboard";
+  document.getElementById("topbar-sub").textContent = "Welcome back — what will you create today?";
+}
+
+function openTool(tool) {
+  document.querySelectorAll(".tool-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + tool).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  const map = { caption:1, script:2, proposal:3, calendar:4, email:5, outreach:6 };
+  document.querySelectorAll(".nav-item")[map[tool]].classList.add("active");
+  const titles = {
+    caption:"Caption Generator", script:"Script Writer",
+    proposal:"Proposal Builder", calendar:"Content Calendar",
+    email:"Email Templates", outreach:"Cold Outreach Generator"
+  };
+  document.getElementById("topbar-title").textContent = titles[tool];
+  document.getElementById("topbar-sub").textContent = "Powered by Gemini AI";
+}
+
+// GENERATORS
+async function generateCaption() {
+  hideError("cap-error");
+  const platform = document.getElementById("cap-platform").value;
+  const tone = document.getElementById("cap-tone").value;
+  const topic = document.getElementById("cap-topic").value.trim();
+  const niche = document.getElementById("cap-niche").value.trim();
+  if (!topic) { showError("cap-error","Please enter a topic first."); return; }
+  setLoading("cap-btn", true);
+  try {
+    const prompt = `Write a ${tone.toLowerCase()} ${platform} caption about: "${topic}". ${niche ? `Niche: ${niche}.` : ""} Include relevant hashtags. Make it engaging and platform-appropriate. Keep it concise and impactful.`;
+    const result = await callGemini(prompt);
+    showOutput("cap-output","cap-body", result);
+  } catch(e) { showError("cap-error", e.message); }
+  setLoading("cap-btn", false);
+  document.getElementById("cap-btn").innerHTML = "✨ Generate Caption";
+}
+
+async function generateScript() {
+  hideError("scr-error");
+  const platform = document.getElementById("scr-platform").value;
+  const duration = document.getElementById("scr-duration").value;
+  const topic = document.getElementById("scr-topic").value.trim();
+  const audience = document.getElementById("scr-audience").value.trim();
+  if (!topic) { showError("scr-error","Please enter a video topic."); return; }
+  setLoading("scr-btn", true);
+  try {
+    const prompt = `Write a ${duration} ${platform} video script about: "${topic}". Target audience: ${audience || "general"}. Include a strong hook, main content, and call to action. Format with sections: HOOK, MAIN CONTENT, CTA.`;
+    const result = await callGemini(prompt);
+    showOutput("scr-output","scr-body", result);
+  } catch(e) { showError("scr-error", e.message); }
+  setLoading("scr-btn", false);
+  document.getElementById("scr-btn").innerHTML = "✨ Generate Script";
+}
+
+async function generateProposal() {
+  hideError("pro-error");
+  const sender = document.getElementById("pro-sender").value.trim();
+  const client = document.getElementById("pro-client").value.trim();
+  const service = document.getElementById("pro-service").value;
+  const budget = document.getElementById("pro-budget").value.trim();
+  const details = document.getElementById("pro-details").value.trim();
+  if (!sender || !client) { showError("pro-error","Please fill sender and client name."); return; }
+  setLoading("pro-btn", true);
+  try {
+    const prompt = `Write a professional business proposal from "${sender}" to "${client}" for ${service} services. Budget: ${budget || "to be discussed"}. Details: ${details || "standard service delivery"}. Include: Introduction, Scope of Work, Deliverables, Timeline, Investment, and Next Steps. Keep it professional and persuasive.`;
+    const result = await callGemini(prompt);
+    showOutput("pro-output","pro-body", result);
+  } catch(e) { showError("pro-error", e.message); }
+  setLoading("pro-btn", false);
+  document.getElementById("pro-btn").innerHTML = "✨ Generate Proposal";
+}
+
+async function generateCalendar() {
+  hideError("cal-error");
+  const platform = document.getElementById("cal-platform").value;
+  const duration = document.getElementById("cal-duration").value;
+  const niche = document.getElementById("cal-niche").value.trim();
+  const goal = document.getElementById("cal-goal").value;
+  if (!niche) { showError("cal-error","Please enter your niche."); return; }
+  setLoading("cal-btn", true);
+  try {
+    const prompt = `Create a ${duration} ${platform} content calendar for a ${niche} brand. Goal: ${goal}. For each day provide: Day number, Content type, Topic/Idea, Caption hook. Format it clearly day by day. Make it practical and varied.`;
+    const result = await callGemini(prompt);
+    showOutput("cal-output","cal-body", result);
+  } catch(e) { showError("cal-error", e.message); }
+  setLoading("cal-btn", false);
+  document.getElementById("cal-btn").innerHTML = "✨ Generate Content Calendar";
+}
+
+async function generateEmail() {
+  hideError("em-error");
+  const type = document.getElementById("em-type").value;
+  const tone = document.getElementById("em-tone").value;
+  const brand = document.getElementById("em-brand").value.trim();
+  const msg = document.getElementById("em-msg").value.trim();
+  if (!brand || !msg) { showError("em-error","Please fill brand name and key message."); return; }
+  setLoading("em-btn", true);
+  try {
+    const prompt = `Write a ${tone.toLowerCase()} ${type} email for "${brand}". Key message: ${msg}. Include a compelling subject line, engaging body, and clear call to action. Format: SUBJECT LINE: ... then EMAIL BODY.`;
+    const result = await callGemini(prompt);
+    showOutput("em-output","em-body", result);
+  } catch(e) { showError("em-error", e.message); }
+  setLoading("em-btn", false);
+  document.getElementById("em-btn").innerHTML = "✨ Generate Email";
+}
+
+async function generateOutreach() {
+  hideError("out-error");
+  const type = document.getElementById("out-type").value;
+  const format = document.getElementById("out-format").value;
+  const sender = document.getElementById("out-sender").value.trim();
+  const recipient = document.getElementById("out-recipient").value.trim();
+  const offer = document.getElementById("out-offer").value.trim();
+  if (!sender || !recipient || !offer) { showError("out-error","Please fill all fields."); return; }
+  setLoading("out-btn", true);
+  try {
+    const prompt = `Write a ${format} ${type} message from "${sender}" to "${recipient}". Offer/Request: ${offer}. Make it personalized, concise, and compelling. Include a clear value proposition and call to action. Keep it natural, not salesy.`;
+    const result = await callGemini(prompt);
+    showOutput("out-output","out-body", result);
+  } catch(e) { showError("out-error", e.message); }
+  setLoading("out-btn", false);
+  document.getElementById("out-btn").innerHTML = "✨ Generate Outreach Message";
+}
+</script>
+</body>
+</html>
