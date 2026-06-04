@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — ContentStudio AI</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -354,7 +356,7 @@
     </div>
     <div class="user-area">
       <div class="plan-chip">Free Plan</div>
-      <div class="avatar">M</div>
+      <div class="avatar" id="user-avatar" onclick="handleAvatarClick()" style="cursor:pointer;">M</div>
     </div>
   </div>
 
@@ -731,6 +733,16 @@
 </div><!-- end main -->
 
 <script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCKq98XJIFtYTVrxmn8gTLhIDdUPhUoMSE",
+    authDomain: "contentstudio-ai.firebaseapp.com",
+    projectId: "contentstudio-ai",
+    storageBucket: "contentstudio-ai.firebasestorage.app",
+    messagingSenderId: "480039493990",
+    appId: "1:480039493990:web:955a42ac56e85e951628a7"
+  });
+  const auth = firebase.auth();
+
 // ============ GEMINI API KEY ============
 const GEMINI_KEY = "PLACEHOLDER";
 // ========================================
@@ -772,6 +784,38 @@ function hideError(errId) {
 function copyOutput(bodyId) {
   const text = document.getElementById(bodyId).textContent;
   navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+}
+
+// GOOGLE AUTH
+auth.onAuthStateChanged(function(user) {
+  const avatar = document.getElementById('user-avatar');
+  if (user) {
+    const initials = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U';
+    avatar.textContent = initials;
+    avatar.title = user.displayName + ' - ' + user.email;
+  } else {
+    avatar.textContent = 'M';
+    avatar.title = 'Login with Google';
+  }
+});
+
+function handleAvatarClick() {
+  const user = auth.currentUser;
+  if (user) {
+    if (confirm('Logout karna chahte ho?')) {
+      auth.signOut();
+    }
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(function(result) {
+        const user = result.user;
+        alert('Welcome, ' + user.displayName + '!');
+      })
+      .catch(function(error) {
+        alert('Login failed: ' + error.message);
+      });
+  }
 }
 
 // NAV
