@@ -794,6 +794,76 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 
+// PLAN CONFIG
+const PLAN_CONFIG = {
+  free: { allowedTools: ['caption-generator', 'script-writer'], dailyLimit: 3 },
+  pro: { allowedTools: ['caption-generator', 'script-writer', 'proposal-builder', 'content-calendar', 'email-templates', 'cold-outreach'], dailyLimit: Infinity },
+  max: { allowedTools: ['caption-generator', 'script-writer', 'proposal-builder', 'content-calendar', 'email-templates', 'cold-outreach'], dailyLimit: Infinity }
+};
+
+async function getUserPlan(userId) {
+  const { data } = await sb.from('user_profiles').select('plan').eq('id', userId).single();
+  return data ? data.plan : 'free';
+}
+
+async function getTodayUsage(userId) {
+  const today = new Date().toISOString().split('T')[0];
+  const { count } = await sb.from('usage_logs').select('*', { count: 'exact' }).eq('user_id', userId).gte('used_at', today + 'T00:00:00').lte('used_at', today + 'T23:59:59');
+  return count || 0;
+}
+
+async function logUsage(userId, toolName) {
+  await sb.from('usage_logs').insert({ user_id: userId, tool_name: toolName });
+}
+
+async function canUserUseTool(toolName) {
+  const user = firebase.auth().currentUser;
+  if (!user) { showUpgradePopup('login'); return false; }
+  const plan = await getUserPlan(user.uid);
+  const config = PLAN_CONFIG[plan];
+  if (!config.allowedTools.includes(toolName)) { showUpgradePopup('tool'); return false; }
+  if (plan === 'free') {
+    const usage = await getTodayUsage(user.uid);
+    if (usage >= config.dailyLimit) { showUpgradePopup('limit'); return false; }
+  }
+  await logUsage(user.uid, toolName);
+  return true;
+}
+
+function showUpgradePopup(reason) {
+  const msgs = {
+    login: { title: '🔐 Login Required', body: 'Please login with Google to use AI tools.' },
+    tool: { title: '🔒 Pro Feature', body: 'Yeh tool Pro plan mein available hai. Upgrade karo!' },
+    limit: { title: '⚡ Daily Limit Reached', body: 'Free plan mein sirf 3 generations/day hain. Upgrade karo Pro mein!' }
+  };
+  const m = msgs[reason];
+  document.getElementById('upgrade-modal').style.display = 'flex';
+  document.getElementById('upgrade-modal').innerHTML = `
+    <div style="background:#1E293B;border:1px solid #14B8A6;border-radius:16px;padding:2rem;max-width:420px;width:90%;text-align:center;">
+      <h2 style="color:#F8FAFC;margin-bottom:1rem;">${m.title}</h2>
+      <p style="color:#94A3B8;margin-bottom:1.5rem;">${m.body}</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <div style="border:1px solid #334155;border-radius:12px;padding:1rem;min-width:150px;">
+          <h3 style="color:#14B8A6;">Pro</h3>
+          <p style="color:#F8FAFC;font-size:1.2rem;font-weight:700;">₹299/mo</p>
+          <p style="color:#94A3B8;font-size:0.8rem;">All 6 tools + Unlimited</p>
+          <button onclick="closeUpgradeModal()" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Upgrade</button>
+        </div>
+        <div style="border:2px solid #14B8A6;border-radius:12px;padding:1rem;min-width:150px;background:rgba(20,184,166,0.1);">
+          <h3 style="color:#14B8A6;">Max ⭐</h3>
+          <p style="color:#F8FAFC;font-size:1.2rem;font-weight:700;">₹1999/yr</p>
+          <p style="color:#94A3B8;font-size:0.8rem;">Pro + Team access</p>
+          <button onclick="closeUpgradeModal()" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Get Max</button>
+        </div>
+      </div>
+      <button onclick="closeUpgradeModal()" style="margin-top:1.5rem;background:transparent;color:#64748B;border:none;cursor:pointer;">Maybe later</button>
+    </div>`;
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgrade-modal').style.display = 'none';
+}
+
 // GOOGLE AUTH
 auth.onAuthStateChanged(function(user) {
   const avatar = document.getElementById('user-avatar');
@@ -956,5 +1026,6 @@ async function generateOutreach() {
   document.getElementById("out-btn").innerHTML = "✨ Generate Outreach Message";
 }
 </script>
+<div id="upgrade-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;justify-content:center;align-items:center;"></div>
 </body>
 </html>
