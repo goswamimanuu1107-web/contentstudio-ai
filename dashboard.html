@@ -6,6 +6,7 @@
 <title>Dashboard — ContentStudio AI</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -785,6 +786,13 @@ function copyOutput(bodyId) {
   const text = document.getElementById(bodyId).textContent;
   navigator.clipboard.writeText(text).then(() => alert("Copied!"));
 }
+
+// SUPABASE INIT
+const SUPABASE_URL = 'https://kyimxgbtfcbypxbenmwy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5aW14Z2J0ZmNieXB4YmVubXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTkxNjgsImV4cCI6MjA5NTY5NTE2OH0.fCg7YPC8plaaAixdV2vCL8xIi5T6NBYjanUSKANyaSs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
 
 // GOOGLE AUTH
 auth.onAuthStateChanged(function(user) {
