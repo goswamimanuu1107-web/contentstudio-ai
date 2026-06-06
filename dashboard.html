@@ -871,6 +871,50 @@ function showUpgradePopup(reason) {
     </div>`;
 }
 
+// ONBOARDING FUNCTIONS
+function toggleOption(btn, type) {
+  btn.classList.toggle('selected');
+}
+
+function goToStep2() {
+  const selected = document.querySelectorAll('#role-options .ob-btn.selected');
+  if (selected.length === 0) {
+    alert('Please select at least one option!');
+    return;
+  }
+  document.getElementById('ob-step1').style.display = 'none';
+  document.getElementById('ob-step2').style.display = 'block';
+}
+
+async function finishOnboarding() {
+  const selected = document.querySelectorAll('#need-options .ob-btn.selected');
+  if (selected.length === 0) {
+    alert('Please select at least one option!');
+    return;
+  }
+  const user = firebase.auth().currentUser;
+  if (user) {
+    const roles = [...document.querySelectorAll('#role-options .ob-btn.selected')].map(b => b.textContent.trim());
+    const needs = [...document.querySelectorAll('#need-options .ob-btn.selected')].map(b => b.textContent.trim());
+    await sb.from('user_profiles').upsert({
+      id: user.uid,
+      email: user.email,
+      plan: 'free',
+      roles: roles.join(', '),
+      needs: needs.join(', ')
+    });
+  }
+  document.getElementById('onboarding-modal').style.display = 'none';
+}
+
+function checkOnboarding(user) {
+  sb.from('user_profiles').select('roles').eq('id', user.uid).single().then(({ data }) => {
+    if (!data || !data.roles) {
+      document.getElementById('onboarding-modal').style.display = 'flex';
+    }
+  });
+}
+
 // CHATBOT FUNCTIONS
 function toggleChatbot() {
   const win = document.getElementById('chatbot-window');
@@ -914,6 +958,7 @@ function closeUpgradeModal() {
 auth.onAuthStateChanged(function(user) {
   const avatar = document.getElementById('user-avatar');
   if (user) {
+    checkOnboarding(user);
     const initials = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U';
     avatar.textContent = initials;
     avatar.title = user.displayName + ' - ' + user.email;
@@ -1084,6 +1129,63 @@ async function generateOutreach() {
   document.getElementById("out-btn").innerHTML = "✨ Generate Outreach Message";
 }
 </script>
+<!-- ONBOARDING MODAL -->
+<div id="onboarding-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;justify-content:center;align-items:center;">
+  <div style="background:#1E293B;border:1px solid #14B8A6;border-radius:20px;padding:2rem;max-width:480px;width:90%;text-align:center;">
+    
+    <!-- Step 1 -->
+    <div id="ob-step1">
+      <h2 style="color:#14B8A6;margin-bottom:0.5rem;">👋 Welcome to ContentStudio AI!</h2>
+      <p style="color:#94A3B8;margin-bottom:1.5rem;">Tell us about yourself so we can personalize your experience.</p>
+      <p style="color:#F8FAFC;font-weight:600;margin-bottom:1rem;">I am a...</p>
+      <div id="role-options" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;margin-bottom:1.5rem;">
+        <button onclick="toggleOption(this,'role')" class="ob-btn">🎨 Content Creator</button>
+        <button onclick="toggleOption(this,'role')" class="ob-btn">🎓 Coach / Educator</button>
+        <button onclick="toggleOption(this,'role')" class="ob-btn">💼 Business Owner</button>
+        <button onclick="toggleOption(this,'role')" class="ob-btn">✏️ Freelancer</button>
+        <button onclick="toggleOption(this,'role')" class="ob-btn">🚀 Startup Founder</button>
+        <button onclick="toggleOption(this,'role')" class="ob-btn">🎯 Marketer</button>
+      </div>
+      <button onclick="goToStep2()" style="background:#14B8A6;color:#0F172A;border:none;padding:0.75rem 2rem;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;">Next →</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="ob-step2" style="display:none;">
+      <h2 style="color:#14B8A6;margin-bottom:0.5rem;">✨ What do you need most?</h2>
+      <p style="color:#94A3B8;margin-bottom:1.5rem;">Select all that apply — you can use multiple tools!</p>
+      <div id="need-options" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;margin-bottom:1.5rem;">
+        <button onclick="toggleOption(this,'need')" class="ob-btn">📸 Social Media Captions</button>
+        <button onclick="toggleOption(this,'need')" class="ob-btn">🎬 Video Scripts</button>
+        <button onclick="toggleOption(this,'need')" class="ob-btn">📋 Client Proposals</button>
+        <button onclick="toggleOption(this,'need')" class="ob-btn">📅 Content Planning</button>
+        <button onclick="toggleOption(this,'need')" class="ob-btn">📧 Email Campaigns</button>
+        <button onclick="toggleOption(this,'need')" class="ob-btn">🤝 Cold Outreach</button>
+      </div>
+      <button onclick="finishOnboarding()" style="background:#14B8A6;color:#0F172A;border:none;padding:0.75rem 2rem;border-radius:10px;font-weight:700;cursor:pointer;font-size:1rem;">Let's Go! 🚀</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.ob-btn {
+  background:#0F172A;
+  border:1px solid #334155;
+  color:#94A3B8;
+  padding:0.6rem 1rem;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:0.85rem;
+  transition:all 0.2s;
+}
+.ob-btn.selected {
+  background:rgba(20,184,166,0.15);
+  border-color:#14B8A6;
+  color:#14B8A6;
+  font-weight:600;
+}
+</style>
+
 <!-- GUIDING CHATBOT -->
 <div id="chatbot-bubble" onclick="toggleChatbot()" style="position:fixed;bottom:24px;right:24px;width:56px;height:56px;background:#14B8A6;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9998;box-shadow:0 4px 20px rgba(20,184,166,0.4);font-size:24px;">💬</div>
 
