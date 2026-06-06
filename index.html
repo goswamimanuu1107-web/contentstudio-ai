@@ -443,7 +443,7 @@
         <li>Basic chatbot guide</li>
         <li>Watermark on PDF</li>
       </ul>
-      <a href="#" class="btn-plan btn-plan-outline">Get Started Free</a>
+      <a href="#" class="btn-plan btn-plan-outline" href="dashboard.html">Get Started Free</a>
     </div>
 
     <div class="price-card popular">
@@ -458,7 +458,7 @@
         <li>Priority AI chatbot</li>
         <li>Email templates included</li>
       </ul>
-      <a href="dashboard.html" class="btn-plan btn-plan-filled">Start Pro Plan</a>
+      <a href="#" onclick="initiatePayment('pro')" class="btn-plan btn-plan-filled">Start Pro Plan</a>
     </div>
 
     <div class="price-card">
@@ -472,7 +472,7 @@
         <li>Custom branding</li>
         <li>Priority support</li>
       </ul>
-      <a href="dashboard.html" class="btn-plan btn-plan-outline">Go Max Annual</a>
+      <a href="#" onclick="initiatePayment('max')" class="btn-plan btn-plan-outline">Go Max Annual</a>
     </div>
 
   </div>
@@ -502,5 +502,11 @@
   </div>
 </footer>
 
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+async function initiatePayment(plan) {
+  window.location.href = 'dashboard.html';
+}
+</script>
 </body>
 </html>
