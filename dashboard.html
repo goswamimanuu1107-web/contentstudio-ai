@@ -970,8 +970,8 @@ async function startPayment(plan) {
     });
     const data = await res.json();
     if (data.payment_session_id) {
-      const cashfree = await load({ mode: 'sandbox' });
-      cashfree.checkout({ paymentSessionId: data.payment_session_id });
+      const cashfree = Cashfree({ mode: 'sandbox' });
+      cashfree.checkout({ paymentSessionId: data.payment_session_id, returnUrl: `https://contentstudio-ai.vercel.app/dashboard.html?payment=success&plan=${plan}` });
     } else {
       alert('Payment error: ' + (data.error || 'Unknown error'));
     }
