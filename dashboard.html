@@ -923,6 +923,8 @@ function openTool(tool) {
 
 // GENERATORS
 async function generateCaption() {
+  const allowed = await canUserUseTool('caption-generator');
+  if (!allowed) return;
   hideError("cap-error");
   const platform = document.getElementById("cap-platform").value;
   const tone = document.getElementById("cap-tone").value;
@@ -940,6 +942,8 @@ async function generateCaption() {
 }
 
 async function generateScript() {
+  const allowed = await canUserUseTool('script-writer');
+  if (!allowed) return;
   hideError("scr-error");
   const platform = document.getElementById("scr-platform").value;
   const duration = document.getElementById("scr-duration").value;
@@ -957,6 +961,8 @@ async function generateScript() {
 }
 
 async function generateProposal() {
+  const allowed = await canUserUseTool('proposal-builder');
+  if (!allowed) return;
   hideError("pro-error");
   const sender = document.getElementById("pro-sender").value.trim();
   const client = document.getElementById("pro-client").value.trim();
@@ -975,6 +981,8 @@ async function generateProposal() {
 }
 
 async function generateCalendar() {
+  const allowed = await canUserUseTool('content-calendar');
+  if (!allowed) return;
   hideError("cal-error");
   const platform = document.getElementById("cal-platform").value;
   const duration = document.getElementById("cal-duration").value;
@@ -992,6 +1000,8 @@ async function generateCalendar() {
 }
 
 async function generateEmail() {
+  const allowed = await canUserUseTool('email-templates');
+  if (!allowed) return;
   hideError("em-error");
   const type = document.getElementById("em-type").value;
   const tone = document.getElementById("em-tone").value;
@@ -1009,6 +1019,8 @@ async function generateEmail() {
 }
 
 async function generateOutreach() {
+  const allowed = await canUserUseTool('cold-outreach');
+  if (!allowed) return;
   hideError("out-error");
   const type = document.getElementById("out-type").value;
   const format = document.getElementById("out-format").value;
