@@ -844,8 +844,8 @@ function showUpgradePopup(reason) {
   }
   const msgs = {
     login: { title: '🔐 Login Required', body: 'Please login with Google to use AI tools.' },
-    tool: { title: '🔒 Pro Feature', body: 'Yeh tool Pro plan mein available hai. Upgrade karo!' },
-    limit: { title: '⚡ Daily Limit Reached', body: 'Free plan mein sirf 3 generations/day hain. Upgrade karo Pro mein!' }
+    tool: { title: '🔒 Pro Feature', body: 'This tool is available in Pro plan. Upgrade to unlock all 6 tools!' },
+    limit: { title: '⚡ Daily Limit Reached', body: 'Free plan allows only 3 generations/day. Upgrade to Pro for unlimited access!' }
   };
   const m = msgs[reason];
   document.getElementById('upgrade-modal').style.display = 'flex';
