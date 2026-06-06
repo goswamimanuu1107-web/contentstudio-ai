@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -858,13 +859,13 @@ function showUpgradePopup(reason) {
           <h3 style="color:#14B8A6;">Pro</h3>
           <p style="color:#F8FAFC;font-size:1.2rem;font-weight:700;">₹299/mo</p>
           <p style="color:#94A3B8;font-size:0.8rem;">All 6 tools + Unlimited</p>
-          <button onclick="closeUpgradeModal()" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Upgrade</button>
+          <button onclick="startPayment('pro')" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Upgrade</button>
         </div>
         <div style="border:2px solid #14B8A6;border-radius:12px;padding:1rem;min-width:150px;background:rgba(20,184,166,0.1);">
           <h3 style="color:#14B8A6;">Max ⭐</h3>
           <p style="color:#F8FAFC;font-size:1.2rem;font-weight:700;">₹1999/yr</p>
           <p style="color:#94A3B8;font-size:0.8rem;">Pro + Team access</p>
-          <button onclick="closeUpgradeModal()" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Get Max</button>
+          <button onclick="startPayment('max')" style="margin-top:0.5rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-weight:600;">Get Max</button>
         </div>
       </div>
       <button onclick="closeUpgradeModal()" style="margin-top:1.5rem;background:transparent;color:#64748B;border:none;cursor:pointer;">Maybe later</button>
@@ -947,6 +948,35 @@ async function sendChatMessage() {
   } catch(e) {
     document.getElementById('typing').remove();
     messages.innerHTML += `<div style="background:#0F172A;padding:0.75rem;border-radius:8px;color:#ef4444;font-size:0.85rem;">Error. Please try again.</div>`;
+  }
+}
+
+async function startPayment(plan) {
+  const user = firebase.auth().currentUser;
+  if (!user) { showUpgradePopup('login'); return; }
+
+  closeUpgradeModal();
+
+  try {
+    const res = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan: plan,
+        userEmail: user.email,
+        userName: user.displayName || 'User',
+        userId: user.uid
+      })
+    });
+    const data = await res.json();
+    if (data.payment_session_id) {
+      const cashfree = await load({ mode: 'sandbox' });
+      cashfree.checkout({ paymentSessionId: data.payment_session_id });
+    } else {
+      alert('Payment error: ' + (data.error || 'Unknown error'));
+    }
+  } catch(e) {
+    alert('Payment failed: ' + e.message);
   }
 }
 
