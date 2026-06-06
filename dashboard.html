@@ -831,6 +831,17 @@ async function canUserUseTool(toolName) {
 }
 
 function showUpgradePopup(reason) {
+  if (reason === 'login') {
+    document.getElementById('upgrade-modal').style.display = 'flex';
+    document.getElementById('upgrade-modal').innerHTML = `
+      <div style="background:#1E293B;border:1px solid #14B8A6;border-radius:16px;padding:2rem;max-width:380px;width:90%;text-align:center;">
+        <h2 style="color:#F8FAFC;margin-bottom:1rem;">🔐 Login Required</h2>
+        <p style="color:#94A3B8;margin-bottom:1.5rem;">Please login with Google to use AI tools.</p>
+        <button onclick="handleAvatarClick();closeUpgradeModal();" style="background:#14B8A6;color:#0F172A;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-weight:600;font-size:1rem;">Login with Google</button>
+        <br><button onclick="closeUpgradeModal()" style="margin-top:1rem;background:transparent;color:#64748B;border:none;cursor:pointer;">Maybe later</button>
+      </div>`;
+    return;
+  }
   const msgs = {
     login: { title: '🔐 Login Required', body: 'Please login with Google to use AI tools.' },
     tool: { title: '🔒 Pro Feature', body: 'Yeh tool Pro plan mein available hai. Upgrade karo!' },
