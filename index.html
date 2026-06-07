@@ -443,7 +443,7 @@
         <li>Basic chatbot guide</li>
         <li>Watermark on PDF</li>
       </ul>
-      <a href="#" class="btn-plan btn-plan-outline" href="dashboard.html">Get Started Free</a>
+      <a href="#" class="btn-plan btn-plan-outline" href="dashboard.html" onclick="event.stopPropagation()">Get Started Free</a>
     </div>
 
     <div class="price-card popular">
@@ -505,7 +505,18 @@
 <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 <script>
 async function initiatePayment(plan) {
-  window.location.href = 'dashboard.html';
+  const res = await fetch('/api/payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan: plan, userEmail: 'guest@contentstudioai.com', userName: 'Guest', userId: 'guest_' + Date.now() })
+  });
+  const data = await res.json();
+  if (data.payment_session_id) {
+    const cashfree = Cashfree({ mode: 'sandbox' });
+    cashfree.checkout({ paymentSessionId: data.payment_session_id });
+  } else {
+    window.location.href = 'dashboard.html';
+  }
 }
 </script>
 </body>
