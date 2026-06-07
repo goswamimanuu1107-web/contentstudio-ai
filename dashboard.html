@@ -908,19 +908,16 @@ async function finishOnboarding() {
       console.error('Supabase error:', error);
     }
   }
+
+  if (user) localStorage.setItem('onboarding_done_' + user.uid, 'true');
   document.getElementById('onboarding-modal').style.display = 'none';
 }
 
 function checkOnboarding(user) {
-  sb.from('user_profiles').select('roles').eq('id', user.uid).single().then(({ data, error }) => {
-    if (!data || !data.roles || data.roles.trim() === '') {
-      // Pehli baar login — onboarding dikhao
-      document.getElementById('onboarding-modal').style.display = 'flex';
-    }
-    // Agar roles already saved hain — kuch mat karo, seedha dashboard
-  }).catch(() => {
-    // Network error pe onboarding mat dikhao
-  });
+  const key = 'onboarding_done_' + user.uid;
+  if (!localStorage.getItem(key)) {
+    document.getElementById('onboarding-modal').style.display = 'flex';
+  }
 }
 
 // CHATBOT FUNCTIONS
@@ -1008,7 +1005,7 @@ auth.onAuthStateChanged(function(user) {
 function handleAvatarClick() {
   const user = auth.currentUser;
   if (user) {
-    if (confirm('Logout karna chahte ho?')) {
+    if (confirm('Are you sure you want to logout?')) {
       auth.signOut();
     }
   } else {
