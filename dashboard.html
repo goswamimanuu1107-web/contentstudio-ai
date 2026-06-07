@@ -897,13 +897,16 @@ async function finishOnboarding() {
   if (user) {
     const roles = [...document.querySelectorAll('#role-options .ob-btn.selected')].map(b => b.textContent.trim());
     const needs = [...document.querySelectorAll('#need-options .ob-btn.selected')].map(b => b.textContent.trim());
-    await sb.from('user_profiles').upsert({
+    const { error } = await sb.from('user_profiles').upsert({
       id: user.uid,
       email: user.email,
       plan: 'free',
       roles: roles.join(', '),
       needs: needs.join(', ')
-    });
+    }, { onConflict: 'id' });
+    if (error) {
+      console.error('Supabase error:', error);
+    }
   }
   document.getElementById('onboarding-modal').style.display = 'none';
 }
