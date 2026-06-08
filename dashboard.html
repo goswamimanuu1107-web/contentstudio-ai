@@ -332,7 +332,7 @@
   </div>
 
   <div class="sidebar-section">Account</div>
-  <div class="nav-item" onclick="showHome()">
+  <div class="nav-item" onclick="showSettings()">
     <span class="nav-icon">⚙️</span> Settings
   </div>
 
@@ -872,6 +872,53 @@ function showUpgradePopup(reason) {
     </div>`;
 }
 
+// SETTINGS FUNCTION
+async function loadSettingsData() {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  // Profile
+  const initials = user.displayName ? user.displayName.split(' ').map(n=>n[0]).join('').toUpperCase() : user.email[0].toUpperCase();
+  document.getElementById('settings-avatar').textContent = initials;
+  document.getElementById('settings-name').textContent = user.displayName || 'User';
+  document.getElementById('settings-email').textContent = user.email;
+
+  // Plan
+  const plan = await getUserPlan(user.uid);
+  const planLabels = { free: 'FREE', pro: 'PRO', max: 'MAX' };
+  const planDescs = { free: 'Caption Generator + Script Writer • 3 generations/day', pro: 'All 6 tools • Unlimited generations', max: 'All 6 tools • Unlimited • Team access' };
+  document.getElementById('settings-plan-badge').textContent = planLabels[plan];
+  document.getElementById('settings-plan-desc').textContent = planDescs[plan];
+  if (plan !== 'free') document.getElementById('settings-upgrade-btn').style.display = 'none';
+
+  // Usage
+  const usage = await getTodayUsage(user.uid);
+  const limit = plan === 'free' ? 3 : '∞';
+  document.getElementById('settings-usage-text').textContent = usage + ' / ' + limit;
+  const pct = plan === 'free' ? Math.min((usage/3)*100, 100) : 20;
+  document.getElementById('settings-usage-bar').style.width = pct + '%';
+
+  // API Access
+  const apiHTML = (plan === 'pro' || plan === 'max')
+    ? `<div style="background:#0F172A;border:1px solid #334155;border-radius:8px;padding:1rem;">
+        <p style="color:#94A3B8;font-size:0.85rem;margin-bottom:0.5rem;">Your API Key</p>
+        <code style="color:#14B8A6;font-size:0.8rem;word-break:break-all;">${user.uid}-api-key</code>
+        <br><p style="color:#64748B;font-size:0.75rem;margin-top:0.5rem;">Use this key to integrate ContentStudio AI into your apps.</p>
+       </div>`
+    : `<div style="background:#0F172A;border:1px solid #334155;border-radius:8px;padding:1rem;text-align:center;">
+        <p style="color:#64748B;font-size:0.85rem;">🔒 API Access is available in Pro and Max plans.</p>
+        <button onclick="showUpgradePopup('tool')" style="margin-top:0.75rem;background:#14B8A6;color:#0F172A;border:none;padding:0.5rem 1.2rem;border-radius:8px;cursor:pointer;font-weight:600;">Upgrade to Unlock</button>
+       </div>`;
+  document.getElementById('api-access-section').innerHTML = apiHTML;
+}
+
+function showSettings() {
+  document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('panel-home').style.display = 'none';
+  document.getElementById('settings-panel').style.display = 'block';
+  loadSettingsData();
+}
+
 // ONBOARDING FUNCTIONS
 function toggleOption(btn, type) {
   btn.classList.toggle('selected');
@@ -1163,6 +1210,61 @@ async function generateOutreach() {
   document.getElementById("out-btn").innerHTML = "✨ Generate Outreach Message";
 }
 </script>
+<!-- SETTINGS PANEL -->
+<div id="settings-panel" style="display:none;padding:2rem;max-width:700px;">
+  <h2 style="color:#F8FAFC;margin-bottom:0.5rem;">⚙️ Settings</h2>
+  <p style="color:#64748B;margin-bottom:2rem;">Manage your account and preferences.</p>
+
+  <!-- Profile Card -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+    <h3 style="color:#14B8A6;margin-bottom:1rem;">👤 Profile</h3>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div id="settings-avatar" style="width:56px;height:56px;border-radius:50%;background:#14B8A6;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#0F172A;"></div>
+      <div>
+        <div id="settings-name" style="color:#F8FAFC;font-weight:600;font-size:1rem;"></div>
+        <div id="settings-email" style="color:#64748B;font-size:0.85rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Card -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+    <h3 style="color:#14B8A6;margin-bottom:1rem;">📋 My Plan</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <span id="settings-plan-badge" style="background:rgba(20,184,166,0.15);border:1px solid #14B8A6;color:#14B8A6;padding:0.4rem 1rem;border-radius:20px;font-weight:700;font-size:0.9rem;"></span>
+        <p id="settings-plan-desc" style="color:#64748B;font-size:0.8rem;margin-top:0.5rem;"></p>
+      </div>
+      <button onclick="showUpgradePopup('tool')" id="settings-upgrade-btn" style="background:#14B8A6;color:#0F172A;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-weight:700;cursor:pointer;">⚡ Upgrade Plan</button>
+    </div>
+  </div>
+
+  <!-- Usage Card -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+    <h3 style="color:#14B8A6;margin-bottom:1rem;">📊 Today's Usage</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <span style="color:#94A3B8;font-size:0.9rem;">Generations used today</span>
+      <span id="settings-usage-text" style="color:#F8FAFC;font-weight:700;"></span>
+    </div>
+    <div style="background:#0F172A;border-radius:8px;height:8px;overflow:hidden;">
+      <div id="settings-usage-bar" style="background:#14B8A6;height:100%;transition:width 0.3s;"></div>
+    </div>
+  </div>
+
+  <!-- API Access Card -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+    <h3 style="color:#14B8A6;margin-bottom:0.5rem;">🔌 API Access</h3>
+    <p style="color:#64748B;font-size:0.85rem;margin-bottom:1rem;">Integrate ContentStudio AI into your own apps and workflows.</p>
+    <div id="api-access-section"></div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;">
+    <h3 style="color:#ef4444;margin-bottom:1rem;">⚠️ Account</h3>
+    <button onclick="if(confirm('Are you sure you want to logout?')){firebase.auth().signOut()}" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:0.6rem 1.5rem;border-radius:8px;cursor:pointer;font-weight:600;">Logout</button>
+  </div>
+</div>
+
 <!-- ONBOARDING MODAL -->
 <div id="onboarding-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;justify-content:center;align-items:center;">
   <div style="background:#1E293B;border:1px solid #14B8A6;border-radius:20px;padding:2rem;max-width:480px;width:90%;text-align:center;">
