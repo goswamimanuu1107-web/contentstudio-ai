@@ -915,6 +915,7 @@ async function loadSettingsData() {
 function showSettings() {
   document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
   document.getElementById('panel-home').style.display = 'none';
+  document.querySelector('.dashboard-header') && (document.querySelector('.dashboard-header').style.display = 'none');
   document.getElementById('settings-panel').style.display = 'block';
   loadSettingsData();
 }
@@ -1211,7 +1212,7 @@ async function generateOutreach() {
 }
 </script>
 <!-- SETTINGS PANEL -->
-<div id="settings-panel" style="display:none;padding:2rem;max-width:700px;">
+<div id="settings-panel" style="display:none;padding:2rem;max-width:700px;height:100%;overflow-y:auto;">
   <h2 style="color:#F8FAFC;margin-bottom:0.5rem;">⚙️ Settings</h2>
   <p style="color:#64748B;margin-bottom:2rem;">Manage your account and preferences.</p>
 
