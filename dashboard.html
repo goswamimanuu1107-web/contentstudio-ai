@@ -915,17 +915,12 @@ async function loadSettingsData() {
 function showSettings() {
   document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
   document.getElementById('panel-home').style.display = 'none';
-  document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'none');
-  document.getElementById('settings-panel').style.display = 'flex';
-document.getElementById('settings-panel').style.flexDirection = 'column';
-document.querySelector('.content').style.display = 'flex';
-document.querySelector('.content').style.justifyContent = 'center';
-document.querySelector('.content').style.alignItems = 'flex-start';
-document.getElementById('settings-panel').style.margin = '0 auto';
-document.getElementById('settings-panel').style.width = '100%';
-document.getElementById('settings-panel').style.maxWidth = '700px';
+  document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'block');
+  document.querySelector('.content').style.display = 'block';
+  document.getElementById('settings-panel').style.cssText += ';display:block;margin:0;width:auto;max-width:100%;';
   loadSettingsData();
 }
+
 
 // ONBOARDING FUNCTIONS
 function toggleOption(btn, type) {
