@@ -916,7 +916,10 @@ function showSettings() {
   document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
   document.getElementById('panel-home').style.display = 'none';
   document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'none');
-  document.getElementById('settings-panel').style.display = 'block';
+  document.getElementById('settings-panel').style.display = 'flex';
+document.getElementById('settings-panel').style.flexDirection = 'column';
+document.querySelector('.content').style.display = 'flex';
+document.querySelector('.content').style.justifyContent = 'center';
   loadSettingsData();
 }
 
