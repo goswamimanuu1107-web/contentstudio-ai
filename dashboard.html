@@ -920,6 +920,10 @@ function showSettings() {
 document.getElementById('settings-panel').style.flexDirection = 'column';
 document.querySelector('.content').style.display = 'flex';
 document.querySelector('.content').style.justifyContent = 'center';
+document.querySelector('.content').style.alignItems = 'flex-start';
+document.getElementById('settings-panel').style.margin = '0 auto';
+document.getElementById('settings-panel').style.width = '100%';
+document.getElementById('settings-panel').style.maxWidth = '700px';
   loadSettingsData();
 }
 
