@@ -913,11 +913,9 @@ async function loadSettingsData() {
 }
 
 function showSettings() {
-  document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+  showHome();
   document.getElementById('panel-home').style.display = 'none';
-  document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'block');
-  document.querySelector('.content').style.display = 'block';
-  document.getElementById('settings-panel').style.cssText += ';display:block;margin:0;width:auto;max-width:100%;';
+  document.getElementById('settings-panel').style.display = 'block';
   loadSettingsData();
 }
 
@@ -1214,7 +1212,7 @@ async function generateOutreach() {
 }
 </script>
 <!-- SETTINGS PANEL -->
-<div id="settings-panel" style="display:none;padding:2rem;max-width:700px;height:100%;overflow-y:auto;">
+<div id="settings-panel" style="display:none;padding:2rem;"
   <button onclick="showHome()" style="background:transparent;border:1px solid #334155;color:#94A3B8;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:1rem;font-size:0.85rem;">← Back</button>
 <h2 style="color:#F8FAFC;margin-bottom:0.5rem;">⚙️ Settings</h2>
   <p style="color:#64748B;margin-bottom:2rem;">Manage your account and preferences.</p>
