@@ -913,7 +913,7 @@ async function loadSettingsData() {
 }
 
 function showSettings() {
-  document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+  showHome();
   document.getElementById('panel-home').style.display = 'none';
   document.getElementById('topbar-title').textContent = 'Settings';
   document.getElementById('topbar-sub').textContent = 'Manage your account and preferences.';
