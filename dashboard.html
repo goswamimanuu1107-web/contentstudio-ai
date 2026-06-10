@@ -845,7 +845,7 @@ function showUpgradePopup(reason) {
   }
   const msgs = {
     login: { title: '🔐 Login Required', body: 'Please login with Google to use AI tools.' },
-    tool: { title: '🔒 Pro Feature', body: 'This tool is available in Pro plan. Upgrade to unlock all 6 tools!' },
+    tool: { title: '🔒 Upgrade Features', body: 'This tool is available in Pro & Max plan. Upgrade to unlock all 6 tools and get much more!' },
     limit: { title: '⚡ Daily Limit Reached', body: 'Free plan allows only 3 generations/day. Upgrade to Pro for unlimited access!' }
   };
   const m = msgs[reason];
@@ -1215,6 +1215,7 @@ async function generateOutreach() {
 </script>
 <!-- SETTINGS PANEL -->
 <div id="settings-panel" class="tool-panel" style="display:none;padding:2rem;overflow-y:auto;">
+  <button onclick="showHome()" style="background:transparent;border:1px solid #334155;color:#94A3B8;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:1.5rem;font-size:0.85rem;">← Back to Dashboard</button>
 
   <!-- Profile Card -->
   <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;max-width:700px;">
