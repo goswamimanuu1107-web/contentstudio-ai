@@ -343,7 +343,7 @@
       </div>
       <div class="usage-track"><div class="usage-fill"></div></div>
     </div>
-    <button class="upgrade-btn" onclick="alert('Upgrade coming soon!')">
+    <button class="upgrade-btn" onclick="showUpgradePopup('tool')">
       ⚡ Upgrade to Pro
     </button>
   </div>
@@ -915,6 +915,8 @@ async function loadSettingsData() {
 function showSettings() {
   document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
   document.getElementById('panel-home').style.display = 'none';
+  document.getElementById('topbar-title').textContent = 'Settings';
+  document.getElementById('topbar-sub').textContent = 'Manage your account and preferences.';
   document.getElementById('settings-panel').style.display = 'block';
   loadSettingsData();
 }
@@ -1212,16 +1214,13 @@ async function generateOutreach() {
 }
 </script>
 <!-- SETTINGS PANEL -->
-<div id="settings-panel" class="tool-panel" style="display:none;padding:2rem;"
-  <button onclick="showHome()" style="background:transparent;border:1px solid #334155;color:#94A3B8;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;margin-bottom:1rem;font-size:0.85rem;">← Back</button>
-<h2 style="color:#F8FAFC;margin-bottom:0.5rem;">⚙️ Settings</h2>
-  <p style="color:#64748B;margin-bottom:2rem;">Manage your account and preferences.</p>
+<div id="settings-panel" class="tool-panel" style="display:none;padding:2rem;overflow-y:auto;">
 
   <!-- Profile Card -->
-  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;max-width:700px;">
     <h3 style="color:#14B8A6;margin-bottom:1rem;">👤 Profile</h3>
     <div style="display:flex;align-items:center;gap:1rem;">
-      <div id="settings-avatar" style="width:56px;height:56px;border-radius:50%;background:#14B8A6;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#0F172A;"></div>
+      <div id="settings-avatar" style="width:56px;height:56px;border-radius:50%;background:#14B8A6;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#0F172A;flex-shrink:0;"></div>
       <div>
         <div id="settings-name" style="color:#F8FAFC;font-weight:600;font-size:1rem;"></div>
         <div id="settings-email" style="color:#64748B;font-size:0.85rem;"></div>
@@ -1230,41 +1229,42 @@ async function generateOutreach() {
   </div>
 
   <!-- Plan Card -->
-  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;max-width:700px;">
     <h3 style="color:#14B8A6;margin-bottom:1rem;">📋 My Plan</h3>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
       <div>
         <span id="settings-plan-badge" style="background:rgba(20,184,166,0.15);border:1px solid #14B8A6;color:#14B8A6;padding:0.4rem 1rem;border-radius:20px;font-weight:700;font-size:0.9rem;"></span>
         <p id="settings-plan-desc" style="color:#64748B;font-size:0.8rem;margin-top:0.5rem;"></p>
       </div>
-      <button onclick="showUpgradePopup('tool')" id="settings-upgrade-btn" style="background:#14B8A6;color:#0F172A;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-weight:700;cursor:pointer;">⚡ Upgrade Plan</button>
+      <button id="settings-upgrade-btn" onclick="showUpgradePopup('tool')" style="background:#14B8A6;color:#0F172A;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-weight:700;cursor:pointer;">⚡ Upgrade Plan</button>
     </div>
   </div>
 
   <!-- Usage Card -->
-  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;max-width:700px;">
     <h3 style="color:#14B8A6;margin-bottom:1rem;">📊 Today's Usage</h3>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
       <span style="color:#94A3B8;font-size:0.9rem;">Generations used today</span>
       <span id="settings-usage-text" style="color:#F8FAFC;font-weight:700;"></span>
     </div>
     <div style="background:#0F172A;border-radius:8px;height:8px;overflow:hidden;">
-      <div id="settings-usage-bar" style="background:#14B8A6;height:100%;transition:width 0.3s;"></div>
+      <div id="settings-usage-bar" style="background:#14B8A6;height:100%;transition:width 0.3s;width:0%;"></div>
     </div>
   </div>
 
   <!-- API Access Card -->
-  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;max-width:700px;">
     <h3 style="color:#14B8A6;margin-bottom:0.5rem;">🔌 API Access</h3>
     <p style="color:#64748B;font-size:0.85rem;margin-bottom:1rem;">Integrate ContentStudio AI into your own apps and workflows.</p>
     <div id="api-access-section"></div>
   </div>
 
-  <!-- Danger Zone -->
-  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;">
-    <h3 style="color:#F8FAFC;margin-bottom:1rem;">⚠️ Account</h3>
+  <!-- Account Card -->
+  <div style="background:#1E293B;border:1px solid #334155;border-radius:12px;padding:1.5rem;max-width:700px;">
+    <h3 style="color:#F8FAFC;margin-bottom:1rem;">Account</h3>
     <button onclick="if(confirm('Are you sure you want to logout?')){firebase.auth().signOut()}" style="background:transparent;border:1px solid #475569;color:#F8FAFC;padding:0.6rem 1.5rem;border-radius:8px;cursor:pointer;font-weight:600;">Logout</button>
   </div>
+
 </div>
 
 <!-- ONBOARDING MODAL -->
