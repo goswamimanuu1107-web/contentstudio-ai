@@ -914,7 +914,6 @@ async function loadSettingsData() {
 
 function showSettings() {
   showHome();
-  document.getElementById('panel-home').style.display = 'none';
   document.getElementById('topbar-title').textContent = 'Settings';
   document.getElementById('topbar-sub').textContent = 'Manage your account and preferences.';
   document.getElementById('settings-panel').style.display = 'block';
@@ -1080,6 +1079,7 @@ function showHome() {
   document.getElementById("topbar-title").textContent = "Dashboard";
   document.getElementById("topbar-sub").textContent = "Welcome back — what will you create today?";
   document.getElementById('settings-panel').style.display = 'none';
+  document.getElementById("panel-home").style.display = 'block';
 }
 
 function openTool(tool) {
