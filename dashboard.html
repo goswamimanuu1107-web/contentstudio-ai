@@ -310,6 +310,9 @@
 </div>
 
   <div class="sidebar-section">Tools</div>
+<div class="nav-item" onclick="document.getElementById('feedback-modal').style.display='flex'" style="margin-bottom:0.5rem;background:rgba(20,184,166,0.1);border:1px solid #14B8A6;">
+  <span class="nav-icon">💬</span> Give Feedback
+</div>
   <div class="nav-item active" onclick="showHome()">
     <span class="nav-icon">🏠</span> Dashboard
   </div>
@@ -922,6 +925,34 @@ function showSettings() {
 }
 
 
+// FEEDBACK FUNCTIONS
+let selectedRating = 0;
+
+function setRating(rating) {
+  selectedRating = rating;
+  const stars = document.querySelectorAll('#star-container span');
+  stars.forEach((star, index) => {
+    star.style.opacity = index < rating ? '1' : '0.3';
+  });
+}
+
+async function submitFeedback() {
+  if (selectedRating === 0) {
+    alert('Please select a rating!');
+    return;
+  }
+  const user = firebase.auth().currentUser;
+  const comment = document.getElementById('feedback-comment').value;
+  await sb.from('feedback').insert({
+    user_id: user ? user.uid : 'anonymous',
+    user_email: user ? user.email : 'anonymous',
+    rating: selectedRating,
+    comment: comment
+  });
+  document.getElementById('feedback-modal').style.display = 'none';
+  alert('Thank you for your feedback! 🙏');
+}
+
 // ONBOARDING FUNCTIONS
 function toggleOption(btn, type) {
   btn.classList.toggle('selected');
@@ -1268,6 +1299,24 @@ async function generateOutreach() {
     <button onclick="if(confirm('Are you sure you want to logout?')){firebase.auth().signOut()}" style="background:transparent;border:1px solid #475569;color:#F8FAFC;padding:0.6rem 1.5rem;border-radius:8px;cursor:pointer;font-weight:600;">Logout</button>
   </div>
 
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:99999;justify-content:center;align-items:center;">
+  <div style="background:#1E293B;border:1px solid #14B8A6;border-radius:16px;padding:2rem;max-width:420px;width:90%;text-align:center;">
+    <h2 style="color:#F8FAFC;margin-bottom:0.5rem;">💬 Share Your Feedback</h2>
+    <p style="color:#64748B;font-size:0.85rem;margin-bottom:1.5rem;">Help us improve ContentStudio AI!</p>
+    <div style="display:flex;justify-content:center;gap:0.5rem;margin-bottom:1.5rem;" id="star-container">
+      <span onclick="setRating(1)" style="font-size:2rem;cursor:pointer;">⭐</span>
+      <span onclick="setRating(2)" style="font-size:2rem;cursor:pointer;">⭐</span>
+      <span onclick="setRating(3)" style="font-size:2rem;cursor:pointer;">⭐</span>
+      <span onclick="setRating(4)" style="font-size:2rem;cursor:pointer;">⭐</span>
+      <span onclick="setRating(5)" style="font-size:2rem;cursor:pointer;">⭐</span>
+    </div>
+    <textarea id="feedback-comment" placeholder="Tell us what you think... (optional)" style="width:100%;background:#0F172A;border:1px solid #334155;border-radius:8px;padding:0.75rem;color:#F8FAFC;font-size:0.85rem;resize:none;height:100px;margin-bottom:1rem;box-sizing:border-box;"></textarea>
+    <button onclick="submitFeedback()" style="background:#14B8A6;color:#0F172A;border:none;padding:0.75rem 2rem;border-radius:8px;font-weight:700;cursor:pointer;width:100%;margin-bottom:0.75rem;">Submit Feedback</button>
+    <button onclick="document.getElementById('feedback-modal').style.display='none'" style="background:transparent;color:#64748B;border:none;cursor:pointer;font-size:0.85rem;">Maybe later</button>
+  </div>
 </div>
 
 <!-- ONBOARDING MODAL -->
