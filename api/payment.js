@@ -6,49 +6,50 @@ export default async function handler(req, res) {
   const { plan, userEmail, userName, userId } = req.body;
 
   const planDetails = {
-    pro: { amount: 299, name: 'ContentStudio AI Pro' },
-    max: { amount: 1999, name: 'ContentStudio AI Max' }
+    pro_inr:  { amount: 29900,  currency: 'INR', name: 'ContentStudio AI Pro' },
+    max_inr:  { amount: 199900, currency: 'INR', name: 'ContentStudio AI Max' },
+    pro_usd:  { amount: 900,    currency: 'USD', name: 'ContentStudio AI Pro' },
+    max_usd:  { amount: 10000,  currency: 'USD', name: 'ContentStudio AI Max' }
   };
 
   const selected = planDetails[plan];
   if (!selected) return res.status(400).json({ error: 'Invalid plan' });
 
-  const orderId = 'order_' + Date.now();
-
   try {
-    const response = await fetch('https://sandbox.cashfree.com/pg/orders', {
+    const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString('base64');
+    
+    const response = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-version': '2023-08-01',
-        'x-client-id': process.env.CASHFREE_APP_ID,
-        'x-client-secret': process.env.CASHFREE_SECRET_KEY
+        'Authorization': `Basic ${auth}`
       },
       body: JSON.stringify({
-        order_id: orderId,
-        order_amount: selected.amount,
-        order_currency: 'INR',
-        customer_details: {
-          customer_id: userId,
-          customer_email: userEmail,
-          customer_name: userName,
-          customer_phone: '9999999999'
-        },
-        order_meta: {
-          return_url: `https://contentstudio-ai.vercel.app/dashboard.html?payment=success&plan=${plan}`
+        amount: selected.amount,
+        currency: selected.currency,
+        receipt: `receipt_${Date.now()}`,
+        notes: {
+          user_id: userId,
+          user_email: userEmail,
+          plan: plan
         }
       })
     });
 
     const data = await response.json();
 
-    if (data.payment_session_id) {
+    if (data.id) {
       return res.status(200).json({
-        payment_session_id: data.payment_session_id,
-        order_id: orderId
+        order_id: data.id,
+        amount: selected.amount,
+        currency: selected.currency,
+        key_id: process.env.RAZORPAY_KEY_ID,
+        name: selected.name,
+        userEmail: userEmail,
+        userName: userName
       });
     } else {
-      return res.status(500).json({ error: data.message || 'Payment init failed' });
+      return res.status(500).json({ error: data.error?.description || 'Order creation failed' });
     }
 
   } catch (error) {

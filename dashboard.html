@@ -7,7 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -930,6 +930,17 @@ function showSettings() {
 }
 
 
+// IP DETECTION
+async function getUserCurrency() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    return data.country_code === 'IN' ? 'inr' : 'usd';
+  } catch(e) {
+    return 'inr'; // default to INR if detection fails
+  }
+}
+
 // FEEDBACK FUNCTIONS
 let selectedRating = 0;
 
@@ -1048,20 +1059,34 @@ async function startPayment(plan) {
   closeUpgradeModal();
 
   try {
+    const currency = plan.includes('usd') ? 'usd' : 'inr';
     const res = await fetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        plan: plan,
+        plan: plan + '_' + currency,
         userEmail: user.email,
         userName: user.displayName || 'User',
         userId: user.uid
       })
     });
     const data = await res.json();
-    if (data.payment_session_id) {
-      const cashfree = Cashfree({ mode: 'sandbox' });
-      cashfree.checkout({ paymentSessionId: data.payment_session_id, returnUrl: `https://contentstudio-ai.vercel.app/dashboard.html?payment=success&plan=${plan}` });
+    if (data.order_id) {
+      const options = {
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'ContentStudio AI',
+        description: data.name,
+        order_id: data.order_id,
+        prefill: { name: data.userName, email: data.userEmail },
+        theme: { color: '#14B8A6' },
+        handler: function(response) {
+          window.location.href = '/dashboard.html?payment=success&plan=' + plan;
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
     } else {
       alert('Payment error: ' + (data.error || 'Unknown error'));
     }
