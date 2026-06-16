@@ -6,10 +6,8 @@ export default async function handler(req, res) {
   const { plan, userEmail, userName, userId } = req.body;
 
   const planDetails = {
-    pro_inr:  { amount: 29900,  currency: 'INR', name: 'ContentStudio AI Pro' },
-    max_inr:  { amount: 199900, currency: 'INR', name: 'ContentStudio AI Max' },
-    pro_usd:  { amount: 900,    currency: 'USD', name: 'ContentStudio AI Pro' },
-    max_usd:  { amount: 10000,  currency: 'USD', name: 'ContentStudio AI Max' }
+    pro:  { amount: 29900,  currency: 'INR', name: 'ContentStudio AI Pro' },
+    max:  { amount: 199900, currency: 'INR', name: 'ContentStudio AI Max' },
   };
 
   const selected = planDetails[plan];
