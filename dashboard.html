@@ -1059,12 +1059,11 @@ async function startPayment(plan) {
   closeUpgradeModal();
 
   try {
-    const currency = plan.includes('usd') ? 'usd' : 'inr';
     const res = await fetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        plan: plan + '_' + currency,
+        plan: plan,
         userEmail: user.email,
         userName: user.displayName || 'User',
         userId: user.uid
